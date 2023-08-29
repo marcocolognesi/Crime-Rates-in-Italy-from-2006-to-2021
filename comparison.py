@@ -1,3 +1,4 @@
+# Libraries
 import pandas as pd
 import numpy as np
 import json
@@ -16,8 +17,13 @@ st.title('Trend of Crime Rates over Italy from 2006 to 2021')
 
 # First part --> see the global trend of each type of crime
 
-st.write("## Overall trend of each type of crime")
+# Header and description
+st.markdown('''
+         ## 1. Trend of each type of crime on different levels: ***overall***, ***macro-area***, ***regional*** and ***provincial***
+         ''')
+st.write('Select a crime typology and see its overall trend around the whole Italian territory over the years')
 
+# Select box to choose the type of crime
 crime_option = st.selectbox('Choose the type of crime: ',
                             (list(df['Crime'].unique())))
 
@@ -26,19 +32,32 @@ df_grouped_by_crime_year = df.groupby(['Crime', 'Year']).sum(numeric_only= True)
 # Filtering the DF with the selected crime
 df_grouped_by_crime_selected = df_grouped_by_crime_year.loc[df_grouped_by_crime_year['Crime'] == crime_option]
 
+# Plotly line chart
 fig = px.line(data_frame = df_grouped_by_crime_selected,
             x = 'Year',
             y = 'Value',
             color = 'Crime',
             title = f"Overall trend over the years (absolute values)")
-st.plotly_chart(fig)
+# Displaying the plot
+st.plotly_chart(fig, use_container_width = True)
 
+# ======================================================================================================================================
+
+# Header and description
 st.write(f"### Macro-area comparison of the '{crime_option}' crime")
+st.markdown('''
+            With reference to the crime chosen above, see its overall trend around the different Italian **macro-areas**:
+            * On the left, **absolute values** are taken into consideration;
+            * On the right, **values over 100'000 inhabitants** are taken into consideration.
+            ''')
+
 # Multiselection box to select the areas to compare
 area_multiselection = st.multiselect('Choose the areas you want to compare: ',
                                      (list(df['Area'].unique())))
+
+# Dividing the page into two columns
 col1, col2= st.columns(2)
-# Plotting second column
+# Plotting in the first column (absolute values taken into consideration)
 with col1:
     df_grouped_by_area_crime_year = df.groupby(['Area', 'Crime', 'Year']).sum(numeric_only=True)['Value'].reset_index()
     df_grouped_by_area_crime_selected = df_grouped_by_area_crime_year.loc[df_grouped_by_area_crime_year['Crime'] == crime_option]
@@ -53,7 +72,7 @@ with col1:
             color = 'Area',
             title = f"Overall trend in the different areas (absolute values)")
     st.plotly_chart(fig)
-# Plotting third column
+# Plotting in the second column (incidence taken into consideration)
 with col2:
     df_grouped_by_area_crime_year_incidence = df.groupby(['Area', 'Crime', 'Year']).sum(numeric_only=True)['Value over 100000 population'].reset_index()
     df_grouped_by_area_crime_selected_incidence = df_grouped_by_area_crime_year_incidence.loc[df_grouped_by_area_crime_year_incidence['Crime'] == crime_option]
@@ -69,7 +88,14 @@ with col2:
             title = f"Overall trend in the different areas (Values over 100000 population)")
     st.plotly_chart(fig)
 
+# ============================================================================================================================================================================
+
 st.write(f"### Regional comparison of the '{crime_option}' crime")
+st.markdown('''
+            With reference to the crime chosen above, see its overall trend around the different Italian **regions**:
+            * On the left, **absolute values** are taken into consideration;
+            * On the right, **values over 100'000 inhabitants** are taken into consideration.
+            ''')
 # Multiselection box to select the regions
 region_multiselection = st.multiselect('Choose the regions you want to compare: ',
                                        (list(df['Region'].unique())))
@@ -106,9 +132,13 @@ with col2:
 
 #===========================================================================================================================================================
 
-# Second part --> Comparison of different crime rates for different provinces
+# Comparison of different crime rates for different provinces
 st.write(f"### Provincial comparison of the '{crime_option}' crime")
-
+st.markdown('''
+            With reference to the crime chosen above, see its overall trend around the different Italian **provinces**:
+            * On the left, **absolute values** are taken into consideration;
+            * On the right, **values over 100'000 inhabitants** are taken into consideration.
+            ''')
 
 # Filtering the df through the crime chosen in the selection box
 df_crime = df.loc[df['Crime'] == crime_option]
@@ -145,18 +175,29 @@ with col2:
 
 #===========================================================================================================================================================
 
-# Third part --> Comparison of different crime rates for each province
-st.write("## Comparison of different crime rates for each province")
+# Second part --> Comparison of different crime rates for each province
+st.write('''
+         ## 2. Comparison of different crime rates at different levels: *provincial*, *regional* and *macro-area*
+         ''')
+st.write('''
+        In this section, select multiple crime types and compare the trends at different levels: provincial, regional and macro-area.
+         ''')
 
+# Multiselection box to choose different types of crime
+crime_multiselection = st.multiselect('Choose from the following types of crime:',
+                                   (list(df['Crime'].unique())))
+
+st.write(f"### Provincial comparison of the '{crime_multiselection}' crimes")
+st.markdown('''
+            With reference to the crimes chosen above, see their overall trend around a specific Italian **province**:
+            * On the left, **absolute values** are taken into consideration;
+            * On the right, a pie chart shows their **distribution** in a selected year.
+            ''')
 # Selection box to choose a specific province
 province_option = st.selectbox('Select a province: ',
                                (list(df['Province'].unique())))
 # Using the function get_province_df in order to get a dataframe filtered with the province chosen in the selection box
 df_province = functions.get_province_df(df, province_option)
-
-# Multiselection box to choose different types of crime
-crime_multiselection = st.multiselect('Choose from the following types of crime',
-                                   (list(df_province['Crime'].unique())))
 
 # Slider to choose the year to use for the pie chart
 year_selection = st.slider('Select a year for the pie chart: ',
@@ -191,9 +232,14 @@ with col2:
                  title = f"Distribution of the selected crimes in the province of {province_option} for year {year_selection}")
     st.plotly_chart(fig)
 
+#===========================================================================================================================================================
 
-st.write("## Comparison of different crime rates for each region")
-st.write('You selected: ', crime_multiselection)
+st.write(f"### Regional comparison of the '{crime_multiselection}' crimes")
+st.markdown('''
+            With reference to the crimes chosen above, see their overall trend around a specific Italian **region**:
+            * On the left, **absolute values** are taken into consideration;
+            * On the right, a pie chart shows their **distribution** in a selected year.
+            ''')
 # Selection box to choose a specific province
 region_option = st.selectbox('Select a province: ',
                                (list(df['Region'].unique())))
@@ -235,8 +281,14 @@ with col2:
     st.plotly_chart(fig)
 
 
-st.write("## Comparison of different crime rates for each macro-area")
-st.write('You selected: ', crime_multiselection)
+#===========================================================================================================================================================
+
+st.write(f"### Macro-area comparison of the '{crime_multiselection}' crimes")
+st.markdown('''
+            With reference to the crimes chosen above, see their overall trend around a specific Italian **macro-area**:
+            * On the left, **absolute values** are taken into consideration;
+            * On the right, a pie chart shows their **distribution** in a selected year.
+            ''')
 # Selection box to choose a specific province
 area_option = st.selectbox('Select a macro-area: ',
                                (list(df['Area'].unique())))
