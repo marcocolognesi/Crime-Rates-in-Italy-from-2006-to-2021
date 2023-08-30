@@ -276,3 +276,9 @@ fig = px.scatter(data_frame= df.groupby(['Province', 'Year', 'Population']).sum(
            title = 'Relationship between population and crime rates')
 
 st.plotly_chart(fig, use_container_width= True)
+
+results = px.get_trendline_results(fig)
+
+# Expander than contains the regression results
+with st.expander('Open to see the regression results:'):
+    st.write(results.px_fit_results.iloc[0].summary())
