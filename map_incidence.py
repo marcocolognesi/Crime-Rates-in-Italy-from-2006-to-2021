@@ -9,7 +9,7 @@ import plotly.express as px
 df = pd.read_csv("data/final.csv")
 
 # Importing JSON file created in the data manipulation notebook
-prov_json = json.load(open('data\shapefiles\province.geojson', 'r'))
+prov_json = json.load(open('data/shapefiles/province.geojson', 'r'))
 
 # Initial page configuration settings
 st.set_page_config(layout='wide')
